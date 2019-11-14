@@ -1,0 +1,12 @@
+[environments]
+  [environments.development]
+    name = "websockettest"
+    namespace = "default"
+    wait = true
+    watch = false
+    watch-delay = 2
+    auto-connect = false
+    dockerfile = "Dockerfile"
+    chart = ""
+    custom-tags = ["latest"]
+

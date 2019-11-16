@@ -17,14 +17,20 @@
             return new_uri;
         }
 
+        var ws;
+
         function connect() {
             addLogItem('statuslog', "Connecting");
-            var ws = new WebSocket(getWsUrl());
+            ws = new WebSocket(getWsUrl());
             ws.onopen = function () {
                 addLogItem('statuslog', "Connected");
             };
 
             ws.onmessage = function (e) {
+                data = JSON.parse(e.data);
+                if (data.event == "sync") {
+                    finishSync(data);
+                }
                 addLogItem("messagelog", e.data);
             };
 
@@ -49,13 +55,33 @@
             messages.appendChild(item);
         }
 
+        function onSend() {
+            ws.send(JSON.stringify({ time: new Date().toISOString(), event: "echo", message: "hello" }));
+        }
+
+        function finishSync(data) {
+            var now = new Date();
+            var client = new Date(data.message);
+            var server = new Date(data.time);
+            var rtt = now.getTime() - client.getTime();
+            var offset = (client.getTime() + rtt / 2) - server.getTime();
+            addLogItem('statuslog', `Round trip time: ${rtt} ms, Offset: ${offset} ms`);
+        }
+        function onSync() {
+            ws.send(JSON.stringify({ time: new Date().toISOString(), event: "sync", message: new Date().toISOString() }));
+        }
+
         window.onload = (event) => {
             connect();
+            document.getElementById("sendbutton").onclick = onSend;
+            document.getElementById("syncbutton").onclick = onSync;
         };
     </script>
 </head>
 
 <body>
+    <button id="sendbutton">Send Hello</button>
+    <button id="syncbutton">Synchronise</button>
     <div style="display: flex;">
         <div style="flex: 50%;">
             <strong>Status: </strong>

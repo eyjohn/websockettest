@@ -15,13 +15,13 @@ async def process_request(path, request_headers):
     elif path == "/healthz":
         return http.HTTPStatus.OK, [], b"OK\n"
     with open("index.html", "rb") as in_file:
-            return http.HTTPStatus.OK, [("Content-Type", "text/html")], in_file.read()
+        return http.HTTPStatus.OK, [("Content-Type", "text/html")], in_file.read()
 
 async def ws_handler(websocket, path):
     print(f"ws_handler path={path} headers:\n{websocket.request_headers}")
     while True:
-        now = datetime.datetime.utcnow().isoformat() + "Z"
-        await websocket.send(now)
+        message = "Python: " + datetime.datetime.utcnow().isoformat() + "Z"
+        await websocket.send(message)
         await asyncio.sleep(random.random() * 3)
 
 start_server = websockets.serve(ws_handler, "0.0.0.0", 8080, process_request=process_request)

@@ -56,7 +56,7 @@ async def ws_handler(websocket: websockets.WebSocketServerProtocol, path):
                 "event": "time"
             }))
             await asyncio.sleep(1)
-        logger.info("exiting pings remote_address=%s:%d path=%s",
+        logger.info("exiting time loop remote_address=%s:%d path=%s",
                     websocket.remote_address[0], websocket.remote_address[1], path)
 
     async def wait_closed():
